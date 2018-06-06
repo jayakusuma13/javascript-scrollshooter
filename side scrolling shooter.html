@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>side scrolling shooter javascript</title>
+<style>
+body {
+    /* The image used */
+    background-image: url("background.jpg");
+    background-repeat: repeat-x;
+
+    /* Set a specific height */
+    height: 500px;
+
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#player {
+  position: fixed;
+  top: 25;
+  left: 0;
+}
+
+#enemy {
+  position: fixed;
+  top: 25;
+}
+
+.fire {
+  position: fixed;
+}
+</style>
+</head>
+<button onclick="moveRight()" value="Right">Right</button>
+<button onclick="moveLeft()" value="Left">Left</button>
+<button onclick="moveUp()" value="Up">Up</button>
+<button onclick="moveDown()" value="Down">Down</button>
+<button onclick="fire()" value="shoot">Fire</button>
+<body onload="gameStart()">
+<div id="container">
+  <div id="bulletArea"></div>
+  <img id="player" src="player.png">
+  <img id="enemy" src="enemy.png">
+</div>
+
+</body>
+
+
+<script>
+var player;
+var playerObject = document.getElementById('player');
+var enemyObject = document.getElementById('enemy');
+
+player = new component(30,30,playerObject);
+spawn = new enemySpawn(1000,0,enemyObject);
+bullet = new shoot();
+//enemyObject.style.left = "1000px";
+
+function gameStart(){
+  gameArea.start();
+  console.log('game started');
+}
+
+var gameArea = {
+  start: function(){
+    this.interval = setInterval(gameUpdate, 20);
+  },
+  clear: function(){
+
+  }
+}
+var fireToggle = false;
+function shoot(){
+var object = document.getElementsByClassName('fire');
+  var pos = 0;
+  var j = 0;
+  var k = 0;
+  this.update = function(){
+    j++;
+
+    if(fireToggle){
+      k = 0;
+      fireToggle = false;
+    }
+
+    for(i = 0; i < object.length; i++){
+      k++
+      if(k <= 1500){
+        console.log(k);
+        object[i].style.left = player.x + k + "px";
+      }else{
+        k = 0;
+      }
+
+
+    }
+  }
+}
+
+function enemySpawn(x,y,object){
+  this.object = object;
+  this.speedX = 0;
+  this.speedY = 0;
+  this.x = x;
+  this.y = y;
+  var pos = 0;
+  var ver = 0;
+  var playerBullets = document.getElementsByClassName('fire');
+  this.update = function(){
+     pos++
+    object.style.left =  this.x + "px";
+    //object.style.right =  pos + 'px';
+
+    if(player.y > this.y){
+
+      while(player.y - this.y > 5){
+        this.y = this.y + 0.01;
+        object.style.top = this.y + 'px';
+      }
+    }else if(player.y < this.y){
+
+      while(player.y - this.y < -5){
+        this.y = this.y - 0.01;
+        object.style.top = this.y + 'px';
+      }
+    }
+
+    for(i = 0; i<playerBullets.length;i++){
+      console.log('checking if enemy get hit');
+      if(playerBullets[i].style.left == object.style.left || playerBullets[i].style.top == object.style.top){
+        console.log('you win');
+        object.style.display = "none";
+      }
+    }
+  }
+  this.newPos = function(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+  }
+}
+
+function component(x,y,object){
+  this.object = object;
+  this.speedX = 0;
+  this.speedY = 0;
+  this.x = x;
+  this.y = y;
+  this.pos = 0;
+  this.update = function(){
+    object.style.left = this.x + 'px';
+    object.style.right = this.x + 'px';
+    object.style.top = this.y + 'px';
+    object.style.bottom = this.y + 'px';
+  }
+  this.newPos = function(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+  }
+}
+
+
+function fire(){
+  //fireToggle = true;
+  var toggle = true;
+  var bullet = document.createElement('img');
+  var yPos = player.y + 60 + "px";
+  bullet.setAttribute('class','fire');
+  bullet.setAttribute('src','fire.png');
+  //bullet.setAttribute('style','top:'+yPos+';left:'+yPos);
+  var fly = 0;
+  var id = setInterval(horizontalMove,1);
+  function horizontalMove(){
+    if(fly == 1000){
+      clearInterval(id);
+    }else{
+      fly++;
+      var z = fly*100 + "px";
+      bullet.setAttribute('style','top:'+yPos+';left:'+z);
+    }
+  }
+  this.horizontal = function(velocity){
+    var xPos = player.x + velocity + "px";
+    bullet.setAttribute('style','left:'+xPos);
+  }
+
+  document.getElementById('bulletArea').appendChild(bullet);
+  
+}
+
+var k = 0;
+function bulletMove(){
+  var object = document.getElementsByClassName('fire');
+  if(toggle){
+    k++
+    if(k <= 1500){
+      console.log(k);
+      var xPos = player.x + k + "px";
+      bullet.setAttribute('style','top:'+xPos);
+    }else{
+      k = 0;
+    }
+  }
+}
+  //var k = 0;
+  //var toggle = false;
+  var speed = 0;
+function gameUpdate(){
+  spawn.update();
+  player.newPos();
+  player.update();
+  //bullet.update();
+/*
+  if(toggle){
+    k = 0;
+    toggle = false;
+  }
+  k++
+  if(k <= 150){
+    console.log(k);
+  }else{
+    toggle = true;
+  }*/
+}
+
+function moveRight(){
+  player.speedX += 1;
+  //player.x++;
+}
+
+function moveLeft(){
+  player.speedX -= 1;
+}
+
+function moveUp(){
+  player.speedY -= 1;
+}
+
+function moveDown(){
+  player.speedY += 1;
+}
+
+</script>
+</html>
